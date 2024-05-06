@@ -10,3 +10,4 @@
 
 # Test demo offline
 Chạy/chỉnh demo.py.
+Không cần install framework ngoài
