@@ -32,7 +32,7 @@ class GameClient:
         self.init = None
         self.size = None
         self.room_id = room_id
-        self.ai = TicTacToeAi(board=None, k=5, role=team_roles)
+        self.ai = TicTacToeAi(k=5, role=team_roles)
 
     def listen(self):
         # Lắng nghe yêu cầu từ server trọng tài
@@ -73,9 +73,7 @@ class GameClient:
                     self.size = int(data.get("size"))
                     self.board = copy.deepcopy(data.get("board"))
                     # Lấy nước đi từ AI, nước đi là một tuple (i, j)
-                    ai = TicTacToeAi(copy.deepcopy(self.board),
-                                     self.size, self.team_roles)
-                    move = ai.get_move()
+                    move = self.ai.get_move(self.board)
                     print("Move: ", move)
                     # Kiểm tra nước đi hợp lệ
                     valid_move = self.check_valid_move(move)

@@ -7,7 +7,7 @@ EXP = 4         # Hệ số mũ dùng để đánh giá window
 
 
 def evaluate(board: list[list[str]], k: int, role, op_role) -> int:
-    '''Thuật toán tính điểm: sliding window kích thước k cho từng hàng, cột và đường chéo'''
+    '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
     total = 0
     m = len(board)
     n = len(board[0])

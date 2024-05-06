@@ -10,8 +10,8 @@ def main():
         [' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' '],
     ]
-    ai = TicTacToeAi(board, 5, 'x')
-    print(ai.get_move())
+    ai = TicTacToeAi(5, 'x')
+    print(ai.get_move(board))
     print(ai.get_prune_rate())
 
 

@@ -9,10 +9,10 @@ MAX_DEPTH = 4
 
 
 class TicTacToeAi:
-    def __init__(self, board: list[list[str]], k: int, role: str) -> None:
-        self.board = board
-        self.m = len(board)
-        self.n = len(board[0])
+    def __init__(self, k: int, role: str) -> None:
+        self.board = None
+        self.m = None
+        self.n = None
         self.k = k
         self.role = role
 
@@ -26,7 +26,11 @@ class TicTacToeAi:
         # self.state = 1 << (self.m * self.n * 2)
         # self.available_moves = deque(maxlen=m*n)
 
-    def get_move(self) -> tuple[str, str] | None:
+    def get_move(self, board: list[list[str]]) -> tuple[str, str] | None:
+        self.board = board
+        self.m = len(board)
+        self.n = len(board[0])
+
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role, self.op_role)
@@ -56,7 +60,7 @@ class TicTacToeAi:
                         #     return val
                         # Cập nhật nước đi tốt nhất
                         move = (i, j)
-        return (move, val)
+        return move
 
     def search_max(self, alpha, beta, depth):
         self.cnt += 1
@@ -131,6 +135,6 @@ class TicTacToeAi:
         return val
 
     def get_prune_rate(self):
-        '''Tính tỉ lệ cắt tỉa, chỉ chính xác ở những bước đầu, càng về sau càng lệch tuyến tính do width (số nc có thể đi) giảm.\n
+        '''Tính tỉ lệ cắt tỉa.\n
         Có thể chỉnh cách tính pruning cho chính xác hơn.'''
         return float(self.prune) / (self.cnt + self.prune)
