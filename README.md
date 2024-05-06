@@ -10,4 +10,4 @@
 
 # Test AI offline
 - Chạy/chỉnh demo.py.
-- Không cần install package requirements.
+- Không cần install requirements.
