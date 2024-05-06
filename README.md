@@ -7,3 +7,6 @@
 ![](https://scontent.xx.fbcdn.net/v/t1.15752-9/338423027_612795257382846_7148362617614610924_n.png?_nc_cat=102&ccb=1-7&_nc_sid=aee45a&_nc_ohc=auJEDim19swAX8EKrAr&_nc_ad=z-m&_nc_cid=0&_nc_ht=scontent.xx&oh=03_AdS1gNuZsm3oXfCLnrt9z2YuC52ugg2xcHcIE3N0yBM5pQ&oe=64553462)
 
 *Xem file **app.py** để hiểu cách backend hoạt động*
+
+# Test demo offline
+Chạy/chỉnh demo.py.
