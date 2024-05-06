@@ -8,6 +8,6 @@
 
 *Xem file **app.py** để hiểu cách backend hoạt động*
 
-# Test demo offline
+# Test AI offline
 - Chạy/chỉnh demo.py.
 - Không cần install package requirements.
