@@ -9,5 +9,5 @@
 *Xem file **app.py** để hiểu cách backend hoạt động*
 
 # Test demo offline
-Chạy/chỉnh demo.py.
-Không cần install framework ngoài
+- Chạy/chỉnh demo.py.
+- Không cần install framework ngoài.
