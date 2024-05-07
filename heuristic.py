@@ -88,13 +88,13 @@ def evaluate_ln(k: int, role, op_role, ln):
                         return WIN_PTS
                     else:
                         # Công thức tính điểm của window cho bên mình: 2^(EXP * số ô bên mình)
-                        total += 1 << (EXP * self_cnt)
+                        total += 1 << (EXP * (self_cnt - 1))
             elif op_cnt > 0:            # Khi window chứa ô của đối thủ và không chứa ô của bên mình
                 if op_cnt == k:         # Thua
                     return -WIN_PTS
                 else:
                     # Công thức tính điểm của window cho đối thủ: 2^(EXP * số ô đối thủ)
-                    total -= 1 << (EXP * op_cnt)
+                    total -= 1 << (EXP * (op_cnt - 1))
 
             # loại bỏ phần tử đầu khi window đã đạt đủ kích thước k
             first = window.popleft()

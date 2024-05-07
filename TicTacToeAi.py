@@ -7,6 +7,12 @@ from heuristic import INF, WIN_PTS, evaluate
 # Độ sâu lớn nhất của cây tìm kiếm (nhìn trước bao nhiêu nước đi)
 MAX_DEPTH = 4
 
+# TODO
+# chạy đa luồng cho tầng đầu tiên
+# check nhanh thắng thua trong O(1)
+# dùng queue để lưu trữ các nc đi khả thi
+# chuyển trạng thái về dạng bitwise (51 bit)
+# khắc phục tình trạng đánh bi quan, ko tận dụng nốt cơ hội khi nước đi tốt nhất chỉ dẫn đến hòa (có thể bằng cách giảm MAX_DEPTH nếu biết ko thể thua)
 
 class TicTacToeAi:
     def __init__(self, k: int, role: str) -> None:
