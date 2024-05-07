@@ -1,54 +1,83 @@
-import copy
-import random
 from collections import deque
+from typing import Literal
 
-from heuristic import INF, WIN_PTS, evaluate
-
-# Độ sâu lớn nhất của cây tìm kiếm (nhìn trước bao nhiêu nước đi)
-MAX_DEPTH = 4
+from heuristic import evaluate
+from util import INF, WIN_PTS
+from win_lose import can_lose
 
 # TODO
 # chạy đa luồng cho tầng đầu tiên
 # check nhanh thắng thua trong O(1)
 # dùng queue để lưu trữ các nc đi khả thi
 # chuyển trạng thái về dạng bitwise (51 bit)
-# khắc phục tình trạng đánh bi quan, ko tận dụng nốt cơ hội khi nước đi tốt nhất chỉ dẫn đến hòa (có thể bằng cách giảm MAX_DEPTH nếu biết ko thể thua)
+# (done) khắc phục tình trạng đánh bi quan, ko tận dụng nốt cơ hội khi nước đi tốt nhất chỉ dẫn đến hòa (có thể bằng cách giảm MAX_DEPTH nếu biết ko thể thua)
 
 class TicTacToeAi:
-    def __init__(self, k: int, role: str) -> None:
-        self.board = None
-        self.m = None
-        self.n = None
+    def __init__(self, k: int, role: Literal['x', 'o'], max_depth=4) -> None:
+        """
+        Args:
+            k (int): Số ô liên tiếp cần để thắng
+            role (str): 'x' | 'o'
+        """
+        self.board: list[list[str]]
+        self.m = 0
+        self.n = 0
         self.k = k
-        self.role = role
+        self.max_depth = max_depth
 
         self.prune = 0
         self.cnt = 0
 
+        self.role: Literal['x', 'o'] = role
+        self.op_role: Literal['x', 'o'] = "x"
         if role == "x":
             self.op_role = "o"
-        else:
-            self.op_role = "x"
+
         # self.state = 1 << (self.m * self.n * 2)
         # self.available_moves = deque(maxlen=m*n)
 
-    def get_move(self, board: list[list[str]]) -> tuple[str, str] | None:
+    def get_move(self, board: list[list[str]]) -> tuple[int, int] | None:
         self.board = board
         self.m = len(board)
         self.n = len(board[0])
+        self.prune = 0
 
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role, self.op_role)
         if abs(stop) == WIN_PTS:
-            return stop
+            return None
+
+        res = self.search_best_move()
+
+        if res is None:
+            return None
+
+        if res[1] == 0 and not can_lose(self.board, self.k, self.role):
+            tmp_depth = self.max_depth
+            tmp_res = res
+            while self.max_depth > 2:
+                self.max_depth -= 2
+                tmp_res = self.search_best_move()
+                if tmp_res is not None and tmp_res[1] > 0:
+                    self.max_depth = tmp_depth
+                    return tmp_res[0]
+            self.max_depth = 1
+            tmp_res = self.search_best_move()
+            if tmp_res is not None and tmp_res[1] > 0:
+                self.max_depth = tmp_depth
+                return tmp_res[0]
+        print(f'Depth: {self.max_depth}')
+
+        return res[0]
+
+    def search_best_move(self) -> tuple[tuple[int, int], int] | None:
+        self.cnt += 1
 
         move = None
         val = -INF
         alpha = -INF
         beta = INF
-
-        self.prune = 0
 
         for i in range(self.m):
             for j in range(self.n):
@@ -66,9 +95,13 @@ class TicTacToeAi:
                         #     return val
                         # Cập nhật nước đi tốt nhất
                         move = (i, j)
-        return move
 
-    def search_max(self, alpha, beta, depth):
+        if move is None:
+            return None
+
+        return (move, val)
+
+    def search_max(self, alpha, beta, depth) -> int:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role, self.op_role)
@@ -78,7 +111,7 @@ class TicTacToeAi:
         val = -INF
         is_leaf = True
 
-        if depth < MAX_DEPTH:
+        if depth < self.max_depth:
             for i in range(self.m):
                 for j in range(self.n):
                     if self.board[i][j] == ' ':
@@ -95,7 +128,7 @@ class TicTacToeAi:
                                 alpha = val
                             if val >= beta:
                                 self.prune += (self. m * self.n -
-                                               depth) ** (MAX_DEPTH - depth - 1)
+                                               depth) ** (self.max_depth - depth - 1)
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
@@ -104,7 +137,7 @@ class TicTacToeAi:
 
         return val
 
-    def search_min(self, alpha, beta, depth):
+    def search_min(self, alpha, beta, depth) -> int:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role, self.op_role)
@@ -114,7 +147,7 @@ class TicTacToeAi:
         val = INF
         is_leaf = True
 
-        if depth < MAX_DEPTH:
+        if depth < self.max_depth:
             for i in range(self.m):
                 for j in range(self.n):
                     if self.board[i][j] == ' ':
@@ -131,7 +164,7 @@ class TicTacToeAi:
                                 beta = val
                             if val <= alpha:
                                 self.prune += (self. m * self.n -
-                                               depth) ** (MAX_DEPTH - depth - 1)
+                                               depth) ** (self.max_depth - depth - 1)
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic

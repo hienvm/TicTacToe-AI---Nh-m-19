@@ -1,12 +1,9 @@
 from collections import deque
+from typing import Iterable, Literal
 
-INF = 1 << 30
-WIN_PTS = INF - 1
+from util import EXP, WIN_PTS
 
-EXP = 4         # Hệ số mũ dùng để đánh giá window
-
-
-def evaluate(board: list[list[str]], k: int, role, op_role) -> int:
+def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o']) -> int:
     '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
     total = 0
     m = len(board)
@@ -64,14 +61,14 @@ def evaluate(board: list[list[str]], k: int, role, op_role) -> int:
     return total
 
 
-def evaluate_ln(k: int, role, op_role, ln):
+def evaluate_ln(k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o'], ln: Iterable[str]):
     total = 0
     window = deque(maxlen=k)    # window: một dãy k ô liên tiếp
     # đếm sl các ô của mỗi bên trong window
     self_cnt: int = 0
     op_cnt: int = 0
 
-    # Duyệt qua các ô trong đường
+    # Duyệt từng ô
     for cell in ln:
         # Thêm ô tiếp theo vào cuối window
         window.append(cell)
