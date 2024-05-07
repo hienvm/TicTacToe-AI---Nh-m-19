@@ -15,7 +15,6 @@ def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: L
             tmp = evaluate_ln(k, role, op_role,
                               [board[i][j] for j in range(n)])
             if abs(tmp) == WIN_PTS:
-                # print(board)
                 return tmp
             total += tmp
 
@@ -25,7 +24,6 @@ def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: L
             tmp = evaluate_ln(k, role, op_role,
                               [board[i][j] for i in range(m)])
             if abs(tmp) == WIN_PTS:
-                # print(board)
                 return tmp
             total += tmp
 
@@ -39,7 +37,6 @@ def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: L
             tmp = evaluate_ln(k, role, op_role,
                               [board[j + c][j] for j in range(low, upper)])
             if abs(tmp) == WIN_PTS:
-                # print(board)
                 return tmp
             total += tmp
 
@@ -54,7 +51,6 @@ def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: L
             tmp = evaluate_ln(k, role, op_role,
                               [board[c - j][j] for j in range(low, upper)])
             if abs(tmp) == WIN_PTS:
-                # print(board)
                 return tmp
             total += tmp
 

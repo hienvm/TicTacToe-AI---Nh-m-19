@@ -55,19 +55,15 @@ class TicTacToeAi:
 
         if res[1] == 0 and not can_lose(self.board, self.k, self.role):
             tmp_depth = self.max_depth
-            tmp_res = res
-            while self.max_depth > 2:
-                self.max_depth -= 2
+            while self.max_depth >= 2:
+                if self.max_depth == 2:
+                    self.max_depth = 1
+                else:
+                    self.max_depth -= 2
                 tmp_res = self.search_best_move()
                 if tmp_res is not None and tmp_res[1] > 0:
                     self.max_depth = tmp_depth
                     return tmp_res[0]
-            self.max_depth = 1
-            tmp_res = self.search_best_move()
-            if tmp_res is not None and tmp_res[1] > 0:
-                self.max_depth = tmp_depth
-                return tmp_res[0]
-        print(f'Depth: {self.max_depth}')
 
         return res[0]
 
