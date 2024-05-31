@@ -1,9 +1,10 @@
 from collections import deque
-from typing import Iterable, Literal
 import numpy as np
 
+from util import Cell
 
-def can_lose(board, k: int, role: Literal['x', 'o']) -> bool:
+
+def can_lose(board, k: int, role) -> bool:
     '''Sliding window kích thước k cho từng hàng, cột và đường chéo. Check xem có window nào ko chứa role.'''
     m = len(board)
     n = len(board[0])
@@ -48,7 +49,7 @@ def can_lose(board, k: int, role: Literal['x', 'o']) -> bool:
     return False
 
 
-def can_lose_ln(k: int, role: Literal['x', 'o'], ln: Iterable[str]):
+def can_lose_ln(k: int, role: Cell, ln):
     window = deque(maxlen=k)    # window: một dãy k ô liên tiếp
     # đếm sl các ô của mỗi bên trong window
     op_cnt: int = 0

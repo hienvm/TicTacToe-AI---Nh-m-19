@@ -3,7 +3,7 @@ from typing import Literal
 import numpy as np
 
 from heuristic import evaluate
-from util import INF, WIN_PTS
+from util import INF, WIN_PTS, Cell, toCell
 from win_lose import can_lose
 
 # TODO
@@ -15,7 +15,7 @@ from win_lose import can_lose
 MAX_DEPTH = 1
 
 class TicTacToeAi:
-    def __init__(self, k: int, role: Literal['x', 'o'], max_depth=MAX_DEPTH) -> None:
+    def __init__(self, k: int, role: str, max_depth=MAX_DEPTH) -> None:
         """
         Args:
             k (int): Số ô liên tiếp cần để thắng
@@ -30,23 +30,30 @@ class TicTacToeAi:
         self.prune = 0
         self.cnt = 0
 
-        self.role: Literal['x', 'o'] = role
-        self.op_role: Literal['x', 'o'] = "x"
-        if role == "x":
-            self.op_role = "o"
+        if role == "x" or role == "X":
+            self.role = Cell.X
+            self.op_role = Cell.O
+        else:
+            self.role = Cell.O
+            self.op_role = Cell.X
 
         # self.state = 1 << (self.m * self.n * 2)
         # self.available_moves = deque(maxlen=m*n)
 
     def get_move(self, board: list[list[str]]) -> tuple[int, int] | None:
-        self.board = np.array(board)
-        self.m = len(board)
-        self.n = len(board[0])
+        self.board = np.array([[toCell(s) for s in row]
+                              for row in board], dtype=np.uint8)
+        self.m = len(self.board)
+        self.n = len(self.board[0])
         self.prune = 0
 
         self.cnt += 1
+
+        if self.board.sum() == 0:
+            return (int(self.m / 2), int(self.n / 2))
+
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role, self.op_role)
+        stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
             return None
 
@@ -79,11 +86,11 @@ class TicTacToeAi:
 
         for i in range(self.m):
             for j in range(self.n):
-                if self.board[i][j] == ' ':
+                if self.board[i][j] == Cell.EMPTY:
                     # Duyệt backtrack cây con
                     self.board[i][j] = self.role
                     tmp = self.search_min(alpha, beta, 1)
-                    self.board[i][j] = ' '
+                    self.board[i][j] = Cell.EMPTY
 
                     if tmp > val:
                         val = tmp
@@ -102,7 +109,7 @@ class TicTacToeAi:
     def search_max(self, alpha, beta, depth) -> int:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role, self.op_role)
+        stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
             return stop
 
@@ -112,13 +119,13 @@ class TicTacToeAi:
         if depth < self.max_depth:
             for i in range(self.m):
                 for j in range(self.n):
-                    if self.board[i][j] == ' ':
+                    if self.board[i][j] == Cell.EMPTY:
                         is_leaf = False
 
                         # Duyệt backtrack cây con
                         self.board[i][j] = self.role
                         tmp = self.search_min(alpha, beta, depth + 1)
-                        self.board[i][j] = ' '
+                        self.board[i][j] = Cell.EMPTY
 
                         if tmp > val:
                             val = tmp
@@ -138,7 +145,7 @@ class TicTacToeAi:
     def search_min(self, alpha, beta, depth) -> int:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role, self.op_role)
+        stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
             return stop
 
@@ -148,13 +155,13 @@ class TicTacToeAi:
         if depth < self.max_depth:
             for i in range(self.m):
                 for j in range(self.n):
-                    if self.board[i][j] == ' ':
+                    if self.board[i][j] == Cell.EMPTY:
                         is_leaf = False
 
                         # Duyệt backtrack cây con
                         self.board[i][j] = self.op_role
                         tmp = self.search_max(alpha, beta, depth + 1)
-                        self.board[i][j] = ' '
+                        self.board[i][j] = Cell.EMPTY
 
                         if tmp < val:
                             val = tmp

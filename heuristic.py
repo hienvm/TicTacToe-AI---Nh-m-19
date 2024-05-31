@@ -1,11 +1,10 @@
 from collections import deque
-from typing import Iterable, Literal
 import numpy as np
 
-from util import EXP, WIN_PTS
+from util import EXP, WIN_PTS, Cell, getOp
 
 
-def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o']) -> int:
+def evaluate(board: np.ndarray, k: int, role) -> int:
     '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
     total = 0
     m = len(board)
@@ -14,7 +13,7 @@ def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Litera
     # Tính điểm các hàng
     if n >= k:
         for i in range(m):
-            tmp = evaluate_ln(k, role, op_role,
+            tmp = evaluate_ln(k, role,
                               [board[i][j] for j in range(n)])
             if abs(tmp) == WIN_PTS:
                 return tmp
@@ -23,7 +22,7 @@ def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Litera
     # Tính điểm các cột
     if m >= k:
         for j in range(n):
-            tmp = evaluate_ln(k, role, op_role,
+            tmp = evaluate_ln(k, role,
                               [board[i][j] for i in range(m)])
             if abs(tmp) == WIN_PTS:
                 return tmp
@@ -36,7 +35,7 @@ def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Litera
         low = max(0, -c)
         upper = min(m - c, n)
         if upper - low >= k:
-            tmp = evaluate_ln(k, role, op_role,
+            tmp = evaluate_ln(k, role,
                               [board[j + c][j] for j in range(low, upper)])
             if abs(tmp) == WIN_PTS:
                 return tmp
@@ -50,7 +49,7 @@ def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Litera
         low = max(0, c - m + 1)
         upper = min(c + 1, n)
         if upper - low >= k:
-            tmp = evaluate_ln(k, role, op_role,
+            tmp = evaluate_ln(k, role,
                               [board[c - j][j] for j in range(low, upper)])
             if abs(tmp) == WIN_PTS:
                 return tmp
@@ -59,12 +58,13 @@ def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Litera
     return total
 
 
-def evaluate_ln(k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o'], ln: Iterable[str]):
+def evaluate_ln(k: int, role: Cell, ln):
     total = 0
     window = deque(maxlen=k)    # window: một dãy k ô liên tiếp
     # đếm sl các ô của mỗi bên trong window
     self_cnt: int = 0
     op_cnt: int = 0
+    op_role = getOp(role)
 
     # Duyệt từng ô
     for cell in ln:
