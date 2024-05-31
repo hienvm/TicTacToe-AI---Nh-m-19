@@ -4,7 +4,7 @@ import numpy as np
 import multiprocessing as mp
 
 from heuristic import evaluate
-from util import INF, WIN_PTS, Cell, toCell
+from util import INF, WIN_PTS, Cell, getOp, toCell
 from static_check import can_lose
 
 # TODO
@@ -33,13 +33,11 @@ class TicTacToeAi:
 
         if role in (Cell.X, Cell.O):
             self.role = role
-            self.op_role = abs(3 - role)
         elif role in ("x", "X"):
             self.role = Cell.X
-            self.op_role = Cell.O
         else:
             self.role = Cell.O
-            self.op_role = Cell.X
+        self.op_role = getOp(self.role)
 
         # self.state = 1 << (self.m * self.n * 2)
         # self.available_moves = deque(maxlen=m*n)

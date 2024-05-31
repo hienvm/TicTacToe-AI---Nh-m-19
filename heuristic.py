@@ -4,7 +4,7 @@ import numpy as np
 from util import EXP, WIN_PTS, Cell, getOp
 
 
-def evaluate(board: np.ndarray, k: int, role) -> int:
+def evaluate(board: np.ndarray, k: int, role: int) -> int:
     '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
     total = 0
     m = len(board)
@@ -58,7 +58,7 @@ def evaluate(board: np.ndarray, k: int, role) -> int:
     return total
 
 
-def evaluate_ln(k: int, role: Cell, ln):
+def evaluate_ln(k: int, role: int, ln):
     total = 0
     window = deque(maxlen=k)    # window: một dãy k ô liên tiếp
     # đếm sl các ô của mỗi bên trong window

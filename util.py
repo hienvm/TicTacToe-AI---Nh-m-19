@@ -19,11 +19,5 @@ def toCell(s: str):
             return Cell.EMPTY
 
 
-def getOp(role: Cell):
-    match role:
-        case Cell.X:
-            return Cell.O
-        case Cell.O:
-            return Cell.X
-        case _:
-            return Cell.EMPTY
+def getOp(role: int):
+    return 3 - role
