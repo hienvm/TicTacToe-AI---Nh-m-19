@@ -1,9 +1,11 @@
 from collections import deque
 from typing import Iterable, Literal
+import numpy as np
 
 from util import EXP, WIN_PTS
 
-def evaluate(board: list[list[str]], k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o']) -> int:
+
+def evaluate(board: np.ndarray, k: int, role: Literal['x', 'o'], op_role: Literal['x', 'o']) -> int:
     '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
     total = 0
     m = len(board)

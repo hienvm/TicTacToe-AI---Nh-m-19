@@ -1,5 +1,6 @@
 from collections import deque
 from typing import Literal
+import numpy as np
 
 from heuristic import evaluate
 from util import INF, WIN_PTS
@@ -9,17 +10,18 @@ from win_lose import can_lose
 # chạy đa luồng cho tầng đầu tiên
 # check nhanh thắng thua trong O(1)
 # dùng queue để lưu trữ các nc đi khả thi
-# chuyển trạng thái về dạng bitwise (51 bit)
 # (done) khắc phục tình trạng đánh bi quan, ko tận dụng nốt cơ hội khi nước đi tốt nhất chỉ dẫn đến hòa (có thể bằng cách giảm MAX_DEPTH nếu biết ko thể thua)
 
+MAX_DEPTH = 1
+
 class TicTacToeAi:
-    def __init__(self, k: int, role: Literal['x', 'o'], max_depth=4) -> None:
+    def __init__(self, k: int, role: Literal['x', 'o'], max_depth=MAX_DEPTH) -> None:
         """
         Args:
             k (int): Số ô liên tiếp cần để thắng
             role (str): 'x' | 'o'
         """
-        self.board: list[list[str]]
+        self.board: np.ndarray
         self.m = 0
         self.n = 0
         self.k = k
@@ -37,7 +39,7 @@ class TicTacToeAi:
         # self.available_moves = deque(maxlen=m*n)
 
     def get_move(self, board: list[list[str]]) -> tuple[int, int] | None:
-        self.board = board
+        self.board = np.array(board)
         self.m = len(board)
         self.n = len(board[0])
         self.prune = 0
@@ -160,7 +162,7 @@ class TicTacToeAi:
                                 beta = val
                             if val <= alpha:
                                 self.prune += (self. m * self.n -
-                                               depth) ** (self.max_depth - depth - 1)
+                                               depth) ** (self.max_depth - depth + 1) - 1
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic

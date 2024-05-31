@@ -1,8 +1,9 @@
 from collections import deque
 from typing import Iterable, Literal
+import numpy as np
 
 
-def can_lose(board: list[list[str]], k: int, role: Literal['x', 'o']) -> bool:
+def can_lose(board, k: int, role: Literal['x', 'o']) -> bool:
     '''Sliding window kích thước k cho từng hàng, cột và đường chéo. Check xem có window nào ko chứa role.'''
     m = len(board)
     n = len(board[0])
