@@ -1,6 +1,7 @@
 from collections import deque
 from typing import Literal
 import numpy as np
+import multiprocessing as mp
 
 from heuristic import evaluate
 from util import INF, WIN_PTS, Cell, toCell
@@ -15,7 +16,7 @@ from win_lose import can_lose
 MAX_DEPTH = 1
 
 class TicTacToeAi:
-    def __init__(self, k: int, role: str, max_depth=MAX_DEPTH) -> None:
+    def __init__(self, k: int, role: str | int, max_depth=MAX_DEPTH) -> None:
         """
         Args:
             k (int): Số ô liên tiếp cần để thắng
@@ -27,10 +28,13 @@ class TicTacToeAi:
         self.k = k
         self.max_depth = max_depth
 
-        self.prune = 0
-        self.cnt = 0
+        # self.prune = 0
+        # self.cnt = 0
 
-        if role == "x" or role == "X":
+        if role in (Cell.X, Cell.O):
+            self.role = role
+            self.op_role = abs(3 - role)
+        elif role in ("x", "X"):
             self.role = Cell.X
             self.op_role = Cell.O
         else:
@@ -45,9 +49,9 @@ class TicTacToeAi:
                               for row in board], dtype=np.uint8)
         self.m = len(self.board)
         self.n = len(self.board[0])
-        self.prune = 0
+        # self.prune = 0
 
-        self.cnt += 1
+        # self.cnt += 1
 
         if self.board.sum() == 0:
             return (int(self.m / 2), int(self.n / 2))
@@ -76,8 +80,40 @@ class TicTacToeAi:
 
         return res[0]
 
+    def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:
+        # self.cnt += 1
+        # beta = INF
+        tasks = []
+        processes = []
+        alpha = mp.Value('i', -INF)
+        move = None
+        val = mp.Value('i', -INF)
+        movei = mp.Value('i', -1)
+        movej = mp.Value('i', -1)
+        for i in range(self.m):
+            for j in range(self.n):
+                if self.board[i][j] == Cell.EMPTY:
+                    tasks.append((i, j, self.k, self.role,
+                                  self.max_depth, self.board, alpha, val, movei, movej))
+
+        for task in tasks:
+            p = mp.Process(target=proccess_depth1, args=task)
+            processes.append(p)
+            p.start()
+
+        for p in processes:
+            p.join()
+
+        if movei.value >= 0 and movej.value >= 0:
+            move = (movei.value, movej.value)
+
+        if move is None:
+            return None
+
+        return (move, val.value)
+
     def search_best_move(self) -> tuple[tuple[int, int], int] | None:
-        self.cnt += 1
+        # self.cnt += 1
 
         move = None
         val = -INF
@@ -107,7 +143,7 @@ class TicTacToeAi:
         return (move, val)
 
     def search_max(self, alpha, beta, depth) -> int:
-        self.cnt += 1
+        # self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
@@ -132,8 +168,9 @@ class TicTacToeAi:
                             if val > alpha:
                                 alpha = val
                             if val >= beta:
-                                self.prune += (self. m * self.n -
-                                               depth) ** (self.max_depth - depth - 1)
+                                # self.prune += (self.m * self.n -
+                                #                depth) ** (self.max_depth - depth - 1)
+                                # print("prune_max")
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
@@ -143,7 +180,7 @@ class TicTacToeAi:
         return val
 
     def search_min(self, alpha, beta, depth) -> int:
-        self.cnt += 1
+        # self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
@@ -168,8 +205,9 @@ class TicTacToeAi:
                             if val < beta:
                                 beta = val
                             if val <= alpha:
-                                self.prune += (self. m * self.n -
-                                               depth) ** (self.max_depth - depth + 1) - 1
+                                # self.prune += (self.m * self.n -
+                                #                depth) ** (self.max_depth - depth + 1) - 1
+                                # print("prune_min")
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
@@ -178,7 +216,24 @@ class TicTacToeAi:
 
         return val
 
-    def get_prune_rate(self):
-        '''Tính tỉ lệ cắt tỉa.\n
-        Có thể chỉnh cách tính pruning cho chính xác hơn.'''
-        return float(self.prune) / (self.cnt + self.prune)
+    # def get_prune_rate(self):
+    #     '''Tính tỉ lệ cắt tỉa.\n
+    #     Có thể chỉnh cách tính pruning cho chính xác hơn.'''
+    #     return float(self.prune) / (self.cnt + self.prune)
+
+
+def proccess_depth1(i, j, k, role, max_depth, board, alpha, val, movei, movej):
+    ai = TicTacToeAi(k, role, max_depth)
+    ai.board = board
+    ai.m = len(board)
+    ai.n = len(board[0])
+    # Duyệt backtrack cây con
+    board[i][j] = role
+    tmp = ai.search_min(alpha=alpha.value, beta=INF, depth=1)
+    board[i][j] = Cell.EMPTY
+    if tmp > val.value:
+        val.value = tmp
+        if tmp > alpha.value:
+            alpha.value = tmp
+        movei.value = i
+        movej.value = j
