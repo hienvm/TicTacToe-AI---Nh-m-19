@@ -5,7 +5,7 @@ import multiprocessing as mp
 
 from heuristic import evaluate
 from util import INF, WIN_PTS, Cell, toCell
-from win_lose import can_lose
+from static_check import can_lose
 
 # TODO
 # chạy đa luồng cho tầng đầu tiên
@@ -13,7 +13,7 @@ from win_lose import can_lose
 # dùng queue để lưu trữ các nc đi khả thi
 # (done) khắc phục tình trạng đánh bi quan, ko tận dụng nốt cơ hội khi nước đi tốt nhất chỉ dẫn đến hòa (có thể bằng cách giảm MAX_DEPTH nếu biết ko thể thua)
 
-MAX_DEPTH = 1
+MAX_DEPTH = 2
 
 class TicTacToeAi:
     def __init__(self, k: int, role: str | int, max_depth=MAX_DEPTH) -> None:
@@ -77,7 +77,11 @@ class TicTacToeAi:
                 if tmp_res is not None and tmp_res[1] > 0:
                     self.max_depth = tmp_depth
                     return tmp_res[0]
-
+                
+                
+        print(self.board)
+        print(res[0])
+        
         return res[0]
 
     def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:

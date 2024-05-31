@@ -1,23 +1,15 @@
 from TicTacToeAi import TicTacToeAi
 from heuristic import evaluate
-from win_lose import can_lose
+from static_check import can_lose
 import numpy as np
 from util import toCell
 
 
 def main():
-    board = [
-        ['x', 'x', 'x', 'o', 'x'],
-        ['x', 'o', ' ', 'o', 'o'],
-        ['x', ' ', 'x', 'o', 'o'],
-        ['x', 'x', ' ', 'o', 'o'],
-        ['x', ' ', 'o', 'x', 'o'],
-    ]
-    board = [[' ' for i in range(5)] for j in range(5)]
-    board[0][0] = 'o'
-    ai = TicTacToeAi(5, 'x', max_depth=4)
+    board = [['x', 'x', ' ', ' ', ' ', 'x', ' ', 'x', 'x', ' ', ' ', ' ', ' ', ' ', 'x'], [' ', 'x', ' ', ' ', ' ', 'o', ' ', ' ', ' ', 'o', ' ', 'o', ' ', ' ', 'o'], ['o', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], ['x', ' ', ' ', 'x', ' ', ' ', 'x', 'x', ' ', ' ', ' ', 'x', 'x', ' ', ' '], [' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', 'o', ' ', 'x', 'o', ' ', ' ', 'o'], [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'o', ' ', ' ', ' ', ' '], [' ', ' ', 'o', ' ', ' ', 'o', ' ', 'x', ' ', ' ', ' ', ' ', 'o', ' ', ' '], [' ', ' ', 'o', 'x', 'o', ' ', ' ',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         'x', 'o', ' ', ' ', ' ', ' ', ' ', ' '], [' ', ' ', ' ', 'o', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], ['x', 'o', ' ', 'o', 'o', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', ' ', ' '], [' ', 'o', ' ', ' ', ' ', ' ', ' ', 'x', ' ', ' ', ' ', ' ', 'o', ' ', 'o'], [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' ', ' ', ' ', ' ', ' ', ' '], [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'o', ' '], [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' '], ['x', ' ', 'x', ' ', 'x', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x']]
+    ai = TicTacToeAi(5, 'x', max_depth=2)
     move = ai.get_move(board)
-    print(can_lose(board, 5, toCell('x')))
     if move is not None:
         print(move)
         board[move[0]][move[1]] = 'x'
