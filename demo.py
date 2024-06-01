@@ -6,7 +6,7 @@ from util import toCell
 
 
 def main():
-    board = board = [
+    board = [
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', 'o', ' ', ' '],
         [' ', ' ', ' ', ' ', 'o', ' ', ' '],
