@@ -28,8 +28,8 @@ class TicTacToeAi:
         self.k = k
         self.max_depth = max_depth
 
-        # self.prune = 0
-        # self.cnt = 0
+        self.prune = 0
+        self.cnt = 0
 
         if role in (Cell.X, Cell.O):
             self.role = role
@@ -47,9 +47,9 @@ class TicTacToeAi:
                               for row in board], dtype=np.uint8)
         self.m = len(self.board)
         self.n = len(self.board[0])
-        # self.prune = 0
+        self.prune = 0
 
-        # self.cnt += 1
+        self.cnt = 1
 
         if self.board.sum() == 0:
             return (int(self.m / 2), int(self.n / 2))
@@ -145,7 +145,7 @@ class TicTacToeAi:
         return (move, val)
 
     def search_max(self, alpha, beta, depth) -> int:
-        # self.cnt += 1
+        self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
@@ -170,9 +170,8 @@ class TicTacToeAi:
                             if val > alpha:
                                 alpha = val
                             if val >= beta:
-                                # self.prune += (self.m * self.n -
-                                #                depth) ** (self.max_depth - depth - 1)
-                                # print("prune_max")
+                                self.prune += (self.m * self.n -
+                                               depth) ** (self.max_depth - depth - 1)
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
@@ -182,7 +181,7 @@ class TicTacToeAi:
         return val
 
     def search_min(self, alpha, beta, depth) -> int:
-        # self.cnt += 1
+        self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         stop = evaluate(self.board, self.k, self.role)
         if abs(stop) == WIN_PTS:
@@ -207,9 +206,8 @@ class TicTacToeAi:
                             if val < beta:
                                 beta = val
                             if val <= alpha:
-                                # self.prune += (self.m * self.n -
-                                #                depth) ** (self.max_depth - depth + 1) - 1
-                                # print("prune_min")
+                                self.prune += (self.m * self.n -
+                                               depth) ** (self.max_depth - depth + 1) - 1
                                 return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
