@@ -3,7 +3,7 @@ from typing import Literal
 import numpy as np
 import multiprocessing as mp
 
-from heuristic import evaluate
+from heuristic import Heuristic
 from util import INF, WIN_PTS, Cell, getOp, toCell
 from static_check import can_lose
 
@@ -39,6 +39,8 @@ class TicTacToeAi:
             self.role = Cell.O
         self.op_role = getOp(self.role)
 
+        self.heuristic = Heuristic(k, self.role)
+
         # self.state = 1 << (self.m * self.n * 2)
         # self.available_moves = deque(maxlen=m*n)
 
@@ -47,6 +49,8 @@ class TicTacToeAi:
                               for row in board], dtype=np.uint8)
         self.m = len(self.board)
         self.n = len(self.board[0])
+
+        self.heuristic.build(self.board)
         # self.prune = 0
 
         # self.cnt += 1
@@ -55,7 +59,7 @@ class TicTacToeAi:
             return (int(self.m / 2), int(self.n / 2))
 
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role)
+        stop = self.heuristic.sum()
         if abs(stop) == WIN_PTS:
             return None
 
@@ -114,6 +118,29 @@ class TicTacToeAi:
 
         return (move, val.value)
 
+    def get_av_moves(self, is_max):
+        av_moves = []
+        if is_max:
+            role = self.role
+        else:
+            role = self.op_role
+        for i in range(self.m):
+            for j in range(self.n):
+                if self.board[i][j] == Cell.EMPTY:
+                    # Duyệt backtrack cây con
+                    self.board[i][j] = role
+                    self.heuristic.update(i, j)
+
+                    score = self.heuristic.sum()
+                    if score == WIN_PTS:
+                        return ((i, j), score)
+                    av_moves.append((i, j, score))
+
+                    self.board[i][j] = Cell.EMPTY
+                    self.heuristic.update(i, j)
+        av_moves.sort(key=lambda x: x[2], reverse=is_max)
+        return av_moves
+
     def search_best_move(self) -> tuple[tuple[int, int], int] | None:
         # self.cnt += 1
 
@@ -122,22 +149,29 @@ class TicTacToeAi:
         alpha = -INF
         beta = INF
 
-        for i in range(self.m):
-            for j in range(self.n):
-                if self.board[i][j] == Cell.EMPTY:
-                    # Duyệt backtrack cây con
-                    self.board[i][j] = self.role
-                    tmp = self.search_min(alpha, beta, 1)
-                    self.board[i][j] = Cell.EMPTY
+        av_moves = self.get_av_moves(is_max=True)
+        if isinstance(av_moves, tuple):
+            return av_moves
 
-                    if tmp > val:
-                        val = tmp
-                        if val > alpha:
-                            alpha = val
-                        # if val >= beta:
-                        #     return val
-                        # Cập nhật nước đi tốt nhất
-                        move = (i, j)
+        for i, j, _ in av_moves:
+            # Duyệt backtrack cây con
+            self.board[i][j] = self.role
+            self.heuristic.update(i, j)
+
+            tmp = self.search_min(alpha, beta, 1)
+
+            self.board[i][j] = Cell.EMPTY
+            self.heuristic.update(i, j)
+
+            if tmp > val:
+                val = tmp
+                if val > alpha:
+                    alpha = val
+                # if val >= beta:
+                #     return val
+                # Cập nhật nước đi tốt nhất
+                move = (i, j)
+            print(tmp)
 
         if move is None:
             return None
@@ -147,74 +181,82 @@ class TicTacToeAi:
     def search_max(self, alpha, beta, depth) -> int:
         # self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role)
-        if abs(stop) == WIN_PTS:
-            return stop
+        # stop = evaluate(self.board, self.k, self.role)
+        # if abs(stop) == WIN_PTS:
+        #     return stop
 
         val = -INF
         is_leaf = True
 
         if depth < self.max_depth:
-            for i in range(self.m):
-                for j in range(self.n):
-                    if self.board[i][j] == Cell.EMPTY:
-                        is_leaf = False
+            av_moves = self.get_av_moves(is_max=True)
+            if isinstance(av_moves, tuple):
+                return av_moves[1]
 
-                        # Duyệt backtrack cây con
-                        self.board[i][j] = self.role
-                        tmp = self.search_min(alpha, beta, depth + 1)
-                        self.board[i][j] = Cell.EMPTY
+            for i, j, _ in av_moves:
+                # Duyệt backtrack cây con
+                self.board[i][j] = self.role
+                self.heuristic.update(i, j)
 
-                        if tmp > val:
-                            val = tmp
-                            if val > alpha:
-                                alpha = val
-                            if val >= beta:
-                                # self.prune += (self.m * self.n -
-                                #                depth) ** (self.max_depth - depth - 1)
-                                # print("prune_max")
-                                return val
+                tmp = self.search_min(alpha, beta, depth + 1)
+
+                self.board[i][j] = Cell.EMPTY
+                self.heuristic.update(i, j)
+
+                if tmp > val:
+                    val = tmp
+                    if val > alpha:
+                        alpha = val
+                    if val >= beta:
+                        # self.prune += (self.m * self.n -
+                        #                depth) ** (self.max_depth - depth - 1)
+                        # print("prune_max")
+                        return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
         if is_leaf:
-            return stop
+            return self.heuristic.sum()
 
         return val
 
     def search_min(self, alpha, beta, depth) -> int:
         # self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
-        stop = evaluate(self.board, self.k, self.role)
-        if abs(stop) == WIN_PTS:
-            return stop
+        # stop = evaluate(self.board, self.k, self.role)
+        # if abs(stop) == WIN_PTS:
+        #     return stop
 
         val = INF
         is_leaf = True
 
         if depth < self.max_depth:
-            for i in range(self.m):
-                for j in range(self.n):
-                    if self.board[i][j] == Cell.EMPTY:
-                        is_leaf = False
+            av_moves = self.get_av_moves(is_max=True)
+            if isinstance(av_moves, tuple):
+                return av_moves[1]
 
-                        # Duyệt backtrack cây con
-                        self.board[i][j] = self.op_role
-                        tmp = self.search_max(alpha, beta, depth + 1)
-                        self.board[i][j] = Cell.EMPTY
+            for i, j, _ in av_moves:
+                # Duyệt backtrack cây con
+                self.board[i][j] = self.op_role
+                self.heuristic.update(i, j)
 
-                        if tmp < val:
-                            val = tmp
-                            if val < beta:
-                                beta = val
-                            if val <= alpha:
-                                # self.prune += (self.m * self.n -
-                                #                depth) ** (self.max_depth - depth + 1) - 1
-                                # print("prune_min")
-                                return val
+                tmp = self.search_max(alpha, beta, depth + 1)
+
+                self.board[i][j] = Cell.EMPTY
+                self.heuristic.update(i, j)
+
+                if tmp < val:
+                    val = tmp
+                    if val < beta:
+                        beta = val
+                    if val <= alpha:
+                        # self.prune += (self.m * self.n -
+                        #                depth) ** (self.max_depth - depth + 1) - 1
+                        # print("prune_min")
+                        return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
         if is_leaf:
-            return stop
+            return self.heuristic.sum()
 
         return val
 
