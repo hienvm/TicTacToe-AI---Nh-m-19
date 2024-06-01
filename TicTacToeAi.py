@@ -80,7 +80,6 @@ class TicTacToeAi:
                     self.max_depth = tmp_depth
                     return tmp_res[0]
                 
-                
         print(self.board)
         print(res[0])
         
@@ -156,12 +155,14 @@ class TicTacToeAi:
         if isinstance(av_moves, tuple):
             return av_moves
 
-        for i, j, _ in av_moves:
+        for i, j, score in av_moves:
             # Duyệt backtrack cây con
             self.board[i][j] = self.role
             self.heuristic.update(i, j)
 
             tmp = self.search_min(alpha, beta, 1)
+            if tmp is None:
+                tmp = score
 
             self.board[i][j] = Cell.EMPTY
             self.heuristic.update(i, j)
@@ -191,16 +192,20 @@ class TicTacToeAi:
         is_leaf = True
 
         if depth < self.max_depth:
+            is_leaf = False
+
             av_moves = self.get_av_moves(is_max=True)
             if isinstance(av_moves, tuple):
                 return av_moves[1]
 
-            for i, j, _ in av_moves:
+            for i, j, score in av_moves:
                 # Duyệt backtrack cây con
                 self.board[i][j] = self.role
                 self.heuristic.update(i, j)
 
                 tmp = self.search_min(alpha, beta, depth + 1)
+                if tmp is None:
+                    tmp = score
 
                 self.board[i][j] = Cell.EMPTY
                 self.heuristic.update(i, j)
@@ -217,7 +222,7 @@ class TicTacToeAi:
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
         if is_leaf:
-            return self.heuristic.sum()
+            return None
 
         return val
 
@@ -232,16 +237,20 @@ class TicTacToeAi:
         is_leaf = True
 
         if depth < self.max_depth:
+            is_leaf = False
+
             av_moves = self.get_av_moves(is_max=False)
             if isinstance(av_moves, tuple):
                 return av_moves[1]
 
-            for i, j, _ in av_moves:
+            for i, j, score in av_moves:
                 # Duyệt backtrack cây con
                 self.board[i][j] = self.op_role
                 self.heuristic.update(i, j)
 
                 tmp = self.search_max(alpha, beta, depth + 1)
+                if tmp is None:
+                    tmp = score
 
                 self.board[i][j] = Cell.EMPTY
                 self.heuristic.update(i, j)
@@ -258,7 +267,7 @@ class TicTacToeAi:
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
         if is_leaf:
-            return self.heuristic.sum()
+            return None
 
         return val
 

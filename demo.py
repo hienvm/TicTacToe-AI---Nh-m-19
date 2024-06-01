@@ -9,16 +9,23 @@ import numpy.random as random
 def main():
     board = [
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', 'o', ' ', ' '],
-        [' ', ' ', ' ', ' ', 'o', ' ', ' '],
-        [' ', 'x', ' ', ' ', 'o', ' ', ' '],
-        [' ', 'x', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', 'x', 'x', ' ', 'o', ' '],
+        [' ', ' ', 'x', 'x', ' ', 'o', ' '],
+        [' ', ' ', ' ', ' ', ' ', 'o', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
     ]
+    # board = np.array([[toCell(s) for s in row]
+    #                   for row in board], dtype=np.uint8)
     # h = Heuristic(5, 1)
-    # h.build(np.array([[toCell(s) for s in row]
-    #                   for row in board], dtype=np.uint8))
+    # h.build(board)
+    # board[2][1] = 1
+    # h.update(2, 1)
+    # board[4][4] = 2
+    # h.update(4, 4)
+
+    # print(board)
     # print(h.sum())
 
     ai = TicTacToeAi(5, 'x', max_depth=2)
