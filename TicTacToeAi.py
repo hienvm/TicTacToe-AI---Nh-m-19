@@ -58,9 +58,10 @@ class TicTacToeAi:
         if self.board.sum() == 0:
             return (int(self.m / 2), int(self.n / 2))
 
-        # Check thắng thua, có thể cải thiện cách tính
-        stop = self.heuristic.sum()
-        if abs(stop) == WIN_PTS:
+        if (np.abs(self.heuristic.horizontal) >= WIN_PTS).sum() >= 0 \
+                or (np.abs(self.heuristic.vertical) >= WIN_PTS).sum() >= 0 \
+                or (np.abs(self.heuristic.desclr) >= WIN_PTS).sum() >= 0 \
+                or (np.abs(self.heuristic.asclr) >= WIN_PTS).sum() >= 0:
             return None
 
         res = self.search_best_move()

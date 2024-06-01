@@ -34,7 +34,7 @@ def main():
         print('|' + '|'.join([f'{cell}' for cell in row]) + '|')
 
     print(100732387800 / 17009103400)
-    print(16415071000)
+    print(18630419700 / 16415071000)
 
     # begin = perf_counter_ns()
     # for i in range(10000):
