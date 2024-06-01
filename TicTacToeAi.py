@@ -28,8 +28,8 @@ class TicTacToeAi:
         self.k = k
         self.max_depth = max_depth
 
-        # self.prune = 0
-        # self.cnt = 0
+        self.prune = 0
+        self.cnt = 0
 
         if role in (Cell.X, Cell.O):
             self.role = role
@@ -51,35 +51,36 @@ class TicTacToeAi:
         self.n = len(self.board[0])
 
         self.heuristic.build(self.board)
-        # self.prune = 0
+        self.prune = 0
 
-        # self.cnt += 1
+        self.cnt = 1
 
         if self.board.sum() == 0:
             return (int(self.m / 2), int(self.n / 2))
 
-        if (np.abs(self.heuristic.horizontal) >= WIN_PTS).sum() >= 0 \
-                or (np.abs(self.heuristic.vertical) >= WIN_PTS).sum() >= 0 \
-                or (np.abs(self.heuristic.desclr) >= WIN_PTS).sum() >= 0 \
-                or (np.abs(self.heuristic.asclr) >= WIN_PTS).sum() >= 0:
-            return None
+        # if (np.abs(self.heuristic.horizontal) >= WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.vertical) >= WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.desclr) >= WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.asclr) >= WIN_PTS).sum() > 0:
+        #     print("END")
+        #     return None
 
         res = self.search_best_move()
 
         if res is None:
             return None
 
-        if res[1] == 0 and not can_lose(self.board, self.k, self.role):
-            tmp_depth = self.max_depth
-            while self.max_depth >= 2:
-                if self.max_depth == 2:
-                    self.max_depth = 1
-                else:
-                    self.max_depth -= 2
-                tmp_res = self.search_best_move()
-                if tmp_res is not None and tmp_res[1] > 0:
-                    self.max_depth = tmp_depth
-                    return tmp_res[0]
+        # if res[1] == 0 and not can_lose(self.board, self.k, self.role):
+        #     tmp_depth = self.max_depth
+        #     while self.max_depth >= 2:
+        #         if self.max_depth == 2:
+        #             self.max_depth = 1
+        #         else:
+        #             self.max_depth -= 2
+        #         tmp_res = self.search_best_move()
+        #         if tmp_res is not None and tmp_res[1] > 0:
+        #             self.max_depth = tmp_depth
+        #             return tmp_res[0]
                 
         print(self.board)
         print(res[0])
@@ -145,7 +146,7 @@ class TicTacToeAi:
         return av_moves
 
     def search_best_move(self) -> tuple[tuple[int, int], int] | None:
-        # self.cnt += 1
+        self.cnt += 1
 
         move = None
         val = -INF
@@ -183,7 +184,7 @@ class TicTacToeAi:
         return (move, val)
 
     def search_max(self, alpha, beta, depth) -> int:
-        # self.cnt += 1
+        self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         # stop = evaluate(self.board, self.k, self.role)
         # if abs(stop) == WIN_PTS:
@@ -216,9 +217,8 @@ class TicTacToeAi:
                     if val > alpha:
                         alpha = val
                     if val >= beta:
-                        # self.prune += (self.m * self.n -
-                        #                depth) ** (self.max_depth - depth - 1)
-                        # print("prune_max")
+                        self.prune += (self.m * self.n -
+                                       depth) ** (self.max_depth - depth - 1)
                         return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
@@ -228,7 +228,7 @@ class TicTacToeAi:
         return val
 
     def search_min(self, alpha, beta, depth) -> int:
-        # self.cnt += 1
+        self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         # stop = evaluate(self.board, self.k, self.role)
         # if abs(stop) == WIN_PTS:
@@ -261,9 +261,8 @@ class TicTacToeAi:
                     if val < beta:
                         beta = val
                     if val <= alpha:
-                        # self.prune += (self.m * self.n -
-                        #                depth) ** (self.max_depth - depth + 1) - 1
-                        # print("prune_min")
+                        self.prune += (self.m * self.n -
+                                       depth) ** (self.max_depth - depth + 1) - 1
                         return val
 
         # Nếu là lá (không còn nc đi hoặc chạm đáy) thì đánh giá heuristic
