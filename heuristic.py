@@ -17,7 +17,7 @@ class Heuristic:
         self.desclr: np.ndarray
         self.asclr: np.ndarray
 
-    def build(self, board):
+    def build(self, board: np.ndarray):
         '''Thuật toán tính heuristic: sliding window kích thước k cho từng hàng, cột và đường chéo'''
         total = 0
         self.board = board
@@ -87,7 +87,7 @@ class Heuristic:
         n = len(self.board[0])
         k = self.k
         total = 0
-        # Tính điểm các hàng
+        # Tính điểm hàng
         score = self.evaluate_ln(
             zip(
                 repeat(i),
@@ -101,7 +101,7 @@ class Heuristic:
         if abs(score) == WIN_PTS:
             return score
         total += score
-        # Tính điểm các cột
+        # Tính điểm cột
         score = self.evaluate_ln(
             zip(
                 range(
@@ -115,7 +115,7 @@ class Heuristic:
         if abs(score) == WIN_PTS:
             return score
         total += score
-        # Tính điểm các đường chéo xuống từ trái sang i - j = c
+        # Tính điểm đường chéo xuống từ trái sang i - j = c
         self.evaluate_ln(
             [
                 (i, j) for i, j in zip(
@@ -129,7 +129,7 @@ class Heuristic:
         if abs(score) == WIN_PTS:
             return score
         total += score
-        # Tính điểm các đường chéo lên từ trái sang i + j = c
+        # Tính điểm đường chéo lên từ trái sang i + j = c
         self.evaluate_ln(
             [
                 (i, j) for i, j in zip(

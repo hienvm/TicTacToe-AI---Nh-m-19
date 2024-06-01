@@ -132,8 +132,11 @@ class TicTacToeAi:
                     self.heuristic.update(i, j)
 
                     score = self.heuristic.sum()
-                    if score == WIN_PTS:
+                    if score == WIN_PTS and is_max:
                         return ((i, j), score)
+                    elif score == -WIN_PTS and not is_max:
+                        return ((i, j), score)
+
                     av_moves.append((i, j, score))
 
                     self.board[i][j] = Cell.EMPTY
