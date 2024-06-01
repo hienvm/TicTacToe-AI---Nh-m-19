@@ -16,19 +16,11 @@ def main():
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
     ]
-    # board = np.array([[toCell(s) for s in row]
-    #                   for row in board], dtype=np.uint8)
-    # h = Heuristic(5, 1)
-    # h.build(board)
-    # board[2][1] = 1
-    # h.update(2, 1)
-    # board[4][4] = 2
-    # h.update(4, 4)
 
-    # print(board)
-    # print(h.sum())
+    board = [[' ' for i in range(15)] for j in range(15)]
+    board[0][0] = 'o'
 
-    ai = TicTacToeAi(5, 'x', max_depth=4)
+    ai = TicTacToeAi(5, 'x', max_depth=2)
 
     begin = perf_counter_ns()
     for i in range(1):
@@ -40,6 +32,7 @@ def main():
         board[move[0]][move[1]] = 'x'
     for row in board:
         print('|' + '|'.join([f'{cell}' for cell in row]) + '|')
+        
     # print(f'Complexity: {ai.cnt * len(board) * len(board[0])}')
     # print(f'Searched nodes: {ai.cnt}')
     # print(f'Pruned nodes: {ai.prune}')
