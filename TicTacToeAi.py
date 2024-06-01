@@ -1,5 +1,3 @@
-from collections import deque
-from typing import Literal
 import numpy as np
 import multiprocessing as mp
 
@@ -65,29 +63,41 @@ class TicTacToeAi:
         # self.prune = 0
         # self.cnt = 1
 
+        # if (np.abs(self.heuristic.horizontal) == WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.vertical) == WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.desclr) == WIN_PTS).sum() > 0 \
+        #         or (np.abs(self.heuristic.asclr) == WIN_PTS).sum() > 0:
+        #     print("END")
+        #     return None
 
-        if (np.abs(self.heuristic.horizontal) == WIN_PTS).sum() > 0 \
-                or (np.abs(self.heuristic.vertical) == WIN_PTS).sum() > 0 \
-                or (np.abs(self.heuristic.desclr) == WIN_PTS).sum() > 0 \
-                or (np.abs(self.heuristic.asclr) == WIN_PTS).sum() > 0:
-            print("END")
-            return None
-        
-        if self.m <= 5 or self.n <= 5:
+        if self.m <= 6 or self.n <= 6:
             self.max_depth = 2
             res = self.search_best_move()
         elif state_sz <= 20:
             self.max_depth = 4
+            print("Parallel")
             res = self.search_best_move_parallel()
         else:
             self.max_depth = 2
-            if state_sz >= 50:
+            if state_sz >= 60:
+                print("Parallel")
                 res = self.search_best_move_parallel()
             else:
                 res = self.search_best_move()
 
+        # self.max_depth = 1
+        # res = self.search_best_move()
+
+        print(f"Depth:\t{self.max_depth}")
+
         if res is None:
-            return None
+            self.max_depth = 1
+            res = self.search_best_move()
+            print("First resort")
+            if res is None:
+                print("Last resort")
+                return self.get_rand_move()
+            return res[0]
 
         if res[1] == 0 and not can_lose(self.board, self.k, self.role):
             tmp_depth = self.max_depth

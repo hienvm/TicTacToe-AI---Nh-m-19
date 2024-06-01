@@ -2,7 +2,7 @@ from collections import deque
 import numpy as np
 from itertools import repeat
 
-from util import EXP, WIN_PTS, Cell, getOp
+from util import EXP, WIN_PTS, getOp
 
 
 class Heuristic:
