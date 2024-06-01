@@ -17,21 +17,29 @@ def main():
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
     ]
 
+    board = [
+        ['o', ' ', ' ', ' ', 'x'],
+        [' ', 'x', ' ', 'o', ' '],
+        ['x', 'x', 'o', 'x', ' '],
+        [' ', 'o', 'x', 'o', 'x'],
+        [' ', 'x', ' ', ' ', 'o'],
+    ]
+
     board = [[' ' for i in range(15)] for j in range(15)]
     board[0][0] = 'o'
 
-    ai = TicTacToeAi(5, 'x', max_depth=2)
+    ai = TicTacToeAi(5, 'x')
 
     begin = perf_counter()
     for i in range(1):
         move = ai.get_move(board)
     end = perf_counter()
-    print(f"Time: {end - begin}")
     if move is not None:
         print(move)
         board[move[0]][move[1]] = 'x'
     for row in board:
         print('|' + '|'.join([f'{cell}' for cell in row]) + '|')
+    print(f"Time: {end - begin}")
 
     # print(100732387800 / 17009103400)
     # print(18630419700 / 16415071000)
@@ -43,8 +51,8 @@ def main():
     # print(end - begin)
 
     # print(f'Complexity: {ai.cnt * len(board) * len(board[0])}')
-    print(f'Searched nodes: {ai.cnt}')
-    print(f'Pruned nodes: {ai.prune}')
+    # print(f'Searched nodes: {ai.cnt}')
+    # print(f'Pruned nodes: {ai.prune}')
     # 7x7 +2: cnt=144 prune=108241 0.5s
     # 7x7 +4: cnt=8449 prune=254484837 28s
     # 15x15 +2: cnt=672 prune=11189025 16s -> parallel 6s
