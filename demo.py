@@ -47,7 +47,7 @@ def main():
     print(f'Pruned nodes: {ai.prune}')
     # 7x7 +2: cnt=144 prune=108241 0.5s
     # 7x7 +4: cnt=8449 prune=254484837 28s
-    # 15x15 +2: cnt=672 prune=11189025 16s
+    # 15x15 +2: cnt=672 prune=11189025 16s -> parallel 6s
     # print(f'Pruning rate: {ai.get_prune_rate()}')
 
     # board = np.array([[toCell(s) for s in row]

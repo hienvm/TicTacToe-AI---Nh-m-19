@@ -65,7 +65,7 @@ class TicTacToeAi:
             print("END")
             return None
 
-        res = self.search_best_move()
+        res = self.search_best_move_parallel()
 
         if res is None:
             return None
@@ -94,37 +94,6 @@ class TicTacToeAi:
         
         return res[0]
 
-    # def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:
-    #     # self.cnt += 1
-    #     # beta = INF
-    #     tasks = []
-    #     processes = []
-    #     alpha = mp.Value('i', -INF)
-    #     move = None
-    #     val = mp.Value('i', -INF)
-    #     movei = mp.Value('i', -1)
-    #     movej = mp.Value('i', -1)
-    #     for i in range(self.m):
-    #         for j in range(self.n):
-    #             if self.board[i][j] == Cell.EMPTY:
-    #                 tasks.append((i, j, self.k, self.role,
-    #                               self.max_depth, self.board, alpha, val, movei, movej))
-
-    #     for task in tasks:
-    #         p = mp.Process(target=proccess_depth1, args=task)
-    #         processes.append(p)
-    #         p.start()
-
-    #     for p in processes:
-    #         p.join()
-
-    #     if movei.value >= 0 and movej.value >= 0:
-    #         move = (movei.value, movej.value)
-
-    #     if move is None:
-    #         return None
-
-    #     return (move, val.value)
 
     def get_available_moves(self, is_max):
         av_moves = []
@@ -283,19 +252,64 @@ class TicTacToeAi:
     #     Có thể chỉnh cách tính pruning cho chính xác hơn.'''
     #     return float(self.prune) / (self.cnt + self.prune)
 
+    def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:
+        # self.cnt += 1
+        # beta = INF
+        processes = []
+        alpha = mp.Value('i', -INF)
+        move = None
+        val = mp.Value('i', -INF)
+        movei = mp.Value('i', -1)
+        movej = mp.Value('i', -1)
 
-def proccess_depth1(i, j, k, role, max_depth, board, alpha, val, movei, movej):
+        av_moves = self.get_available_moves(is_max=True)
+        if isinstance(av_moves, tuple):
+            return av_moves
+
+        threads_cnt = mp.cpu_count()
+        batches = [av_moves[i::threads_cnt] for i in range(threads_cnt)]
+
+        tasks = [(batch, self.k, self.role,
+                 self.max_depth, self.board, alpha, val, movei, movej)
+                 for batch in batches]
+
+        for task in tasks:
+            p = mp.Process(target=proccess_depth1, args=task)
+            processes.append(p)
+            p.start()
+
+        for p in processes:
+            p.join()
+
+        if movei.value >= 0 and movej.value >= 0:
+            move = (movei.value, movej.value)
+
+        if move is None:
+            return None
+
+        return (move, val.value)
+
+
+def proccess_depth1(batch, k, role, max_depth, board, alpha, val, movei, movej):
     ai = TicTacToeAi(k, role, max_depth)
     ai.board = board
+    ai.heuristic.build(board)
     ai.m = len(board)
     ai.n = len(board[0])
-    # Duyệt backtrack cây con
-    board[i][j] = role
-    tmp = ai.search_min(alpha=alpha.value, beta=INF, depth=1)
-    board[i][j] = Cell.EMPTY
-    if tmp > val.value:
-        val.value = tmp
-        if tmp > alpha.value:
-            alpha.value = tmp
-        movei.value = i
-        movej.value = j
+    for i, j, score in batch:
+        # Duyệt backtrack cây con
+        board[i][j] = role
+        ai.heuristic.update(i, j)
+
+        tmp = ai.search_min(alpha.value, INF, 1)
+        if tmp is None:
+            tmp = score
+
+        board[i][j] = Cell.EMPTY
+        ai.heuristic.update(i, j)
+        if tmp > val.value:
+            val.value = tmp
+            if tmp > alpha.value:
+                alpha.value = tmp
+            movei.value = i
+            movej.value = j
