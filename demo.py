@@ -29,12 +29,22 @@ def main():
     # print(h.sum())
 
     ai = TicTacToeAi(5, 'x', max_depth=2)
-    move = ai.get_move(board)
+
+    begin = perf_counter_ns()
+    for i in range(2):
+        move = ai.get_move(board)
+    end = perf_counter_ns()
+    print(f"Time: {end - begin}")
     if move is not None:
         print(move)
         board[move[0]][move[1]] = 'x'
     for row in board:
         print('|' + '|'.join([f'{cell}' for cell in row]) + '|')
+    # begin = perf_counter_ns()
+    # for i in range(10000):
+    #     r = h.sum()
+    # end = perf_counter_ns()
+    # print(end - begin)
 
     # print(f'Complexity: {ai.cnt * len(board) * len(board[0])}')
     # print(f'Searched nodes: {ai.cnt}')
