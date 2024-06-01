@@ -1,3 +1,4 @@
+from time import perf_counter_ns
 from TicTacToeAi import TicTacToeAi
 from heuristic import evaluate
 from static_check import can_lose
@@ -8,15 +9,32 @@ from util import toCell
 def main():
     board = [
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', 'o', ' ', ' '],
-        [' ', ' ', ' ', ' ', 'o', ' ', ' '],
-        [' ', 'x', ' ', ' ', 'o', ' ', ' '],
-        [' ', 'x', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', 'x', 'x', ' ', 'o', ' '],
+        [' ', ' ', 'x', 'x', ' ', 'o', ' '],
+        [' ', ' ', ' ', ' ', ' ', 'o', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
     ]
-    ai = TicTacToeAi(5, 'x', max_depth=2)
-    move = ai.get_move(board)
+    # board = np.array([[toCell(s) for s in row]
+    #                   for row in board], dtype=np.uint8)
+    # h = Heuristic(5, 1)
+    # h.build(board)
+    # board[2][1] = 1
+    # h.update(2, 1)
+    # board[4][4] = 2
+    # h.update(4, 4)
+
+    # print(board)
+    # print(h.sum())
+
+    ai = TicTacToeAi(5, 'x', max_depth=4)
+
+    begin = perf_counter_ns()
+    for i in range(1):
+        move = ai.get_move(board)
+    end = perf_counter_ns()
+    print(f"Time: {end - begin}")
     if move is not None:
         print(move)
         board[move[0]][move[1]] = 'x'
