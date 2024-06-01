@@ -58,29 +58,36 @@ class TicTacToeAi:
         if self.board.sum() == 0:
             return (int(self.m / 2), int(self.n / 2))
 
-        # if (np.abs(self.heuristic.horizontal) >= WIN_PTS).sum() > 0 \
-        #         or (np.abs(self.heuristic.vertical) >= WIN_PTS).sum() > 0 \
-        #         or (np.abs(self.heuristic.desclr) >= WIN_PTS).sum() > 0 \
-        #         or (np.abs(self.heuristic.asclr) >= WIN_PTS).sum() > 0:
-        #     print("END")
-        #     return None
+        if (np.abs(self.heuristic.horizontal) == WIN_PTS).sum() > 0 \
+                or (np.abs(self.heuristic.vertical) == WIN_PTS).sum() > 0 \
+                or (np.abs(self.heuristic.desclr) == WIN_PTS).sum() > 0 \
+                or (np.abs(self.heuristic.asclr) == WIN_PTS).sum() > 0:
+            print("END")
+            return None
 
         res = self.search_best_move()
 
         if res is None:
             return None
 
-        # if res[1] == 0 and not can_lose(self.board, self.k, self.role):
-        #     tmp_depth = self.max_depth
-        #     while self.max_depth >= 2:
-        #         if self.max_depth == 2:
-        #             self.max_depth = 1
-        #         else:
-        #             self.max_depth -= 2
-        #         tmp_res = self.search_best_move()
-        #         if tmp_res is not None and tmp_res[1] > 0:
-        #             self.max_depth = tmp_depth
-        #             return tmp_res[0]
+        if res[1] == 0 and not can_lose(self.board, self.k, self.role):
+            tmp_depth = self.max_depth
+            self.max_depth = 1
+            res = self.search_best_move()
+            self.max_depth = tmp_depth
+            if res is None:
+                return None
+
+            # while self.max_depth >= 2:
+            #     if self.max_depth == 2:
+            #         self.max_depth = 1
+            #     else:
+            #         self.max_depth -= 2
+            #     tmp_res = self.search_best_move()
+            #     if tmp_res is not None and tmp_res[1] > 0:
+            #         self.max_depth = tmp_depth
+            #         return tmp_res[0]
+            # self.max_depth = tmp_depth
                 
         print(self.board)
         print(res[0])
@@ -119,7 +126,7 @@ class TicTacToeAi:
 
     #     return (move, val.value)
 
-    def get_av_moves(self, is_max):
+    def get_available_moves(self, is_max):
         av_moves = []
         if is_max:
             role = self.role
@@ -153,7 +160,7 @@ class TicTacToeAi:
         alpha = -INF
         beta = INF
 
-        av_moves = self.get_av_moves(is_max=True)
+        av_moves = self.get_available_moves(is_max=True)
         if isinstance(av_moves, tuple):
             return av_moves
 
@@ -183,7 +190,7 @@ class TicTacToeAi:
 
         return (move, val)
 
-    def search_max(self, alpha, beta, depth) -> int:
+    def search_max(self, alpha, beta, depth) -> int | None:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         # stop = evaluate(self.board, self.k, self.role)
@@ -196,7 +203,7 @@ class TicTacToeAi:
         if depth < self.max_depth:
             is_leaf = False
 
-            av_moves = self.get_av_moves(is_max=True)
+            av_moves = self.get_available_moves(is_max=True)
             if isinstance(av_moves, tuple):
                 return av_moves[1]
 
@@ -227,7 +234,7 @@ class TicTacToeAi:
 
         return val
 
-    def search_min(self, alpha, beta, depth) -> int:
+    def search_min(self, alpha, beta, depth) -> int | None:
         self.cnt += 1
         # Check thắng thua, có thể cải thiện cách tính
         # stop = evaluate(self.board, self.k, self.role)
@@ -240,7 +247,7 @@ class TicTacToeAi:
         if depth < self.max_depth:
             is_leaf = False
 
-            av_moves = self.get_av_moves(is_max=False)
+            av_moves = self.get_available_moves(is_max=False)
             if isinstance(av_moves, tuple):
                 return av_moves[1]
 
