@@ -16,7 +16,7 @@ def main():
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         [' ', ' ', ' ', ' ', ' ', ' ', ' '],
     ]
-    ai = TicTacToeAi(5, 'x', max_depth=4)
+    ai = TicTacToeAi(5, 'x', max_depth=2)
     move = ai.get_move(board)
     if move is not None:
         print(move)

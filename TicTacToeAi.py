@@ -86,37 +86,37 @@ class TicTacToeAi:
         
         return res[0]
 
-    def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:
-        # self.cnt += 1
-        # beta = INF
-        tasks = []
-        processes = []
-        alpha = mp.Value('i', -INF)
-        move = None
-        val = mp.Value('i', -INF)
-        movei = mp.Value('i', -1)
-        movej = mp.Value('i', -1)
-        for i in range(self.m):
-            for j in range(self.n):
-                if self.board[i][j] == Cell.EMPTY:
-                    tasks.append((i, j, self.k, self.role,
-                                  self.max_depth, self.board, alpha, val, movei, movej))
+    # def search_best_move_parallel(self) -> tuple[tuple[int, int], int] | None:
+    #     # self.cnt += 1
+    #     # beta = INF
+    #     tasks = []
+    #     processes = []
+    #     alpha = mp.Value('i', -INF)
+    #     move = None
+    #     val = mp.Value('i', -INF)
+    #     movei = mp.Value('i', -1)
+    #     movej = mp.Value('i', -1)
+    #     for i in range(self.m):
+    #         for j in range(self.n):
+    #             if self.board[i][j] == Cell.EMPTY:
+    #                 tasks.append((i, j, self.k, self.role,
+    #                               self.max_depth, self.board, alpha, val, movei, movej))
 
-        for task in tasks:
-            p = mp.Process(target=proccess_depth1, args=task)
-            processes.append(p)
-            p.start()
+    #     for task in tasks:
+    #         p = mp.Process(target=proccess_depth1, args=task)
+    #         processes.append(p)
+    #         p.start()
 
-        for p in processes:
-            p.join()
+    #     for p in processes:
+    #         p.join()
 
-        if movei.value >= 0 and movej.value >= 0:
-            move = (movei.value, movej.value)
+    #     if movei.value >= 0 and movej.value >= 0:
+    #         move = (movei.value, movej.value)
 
-        if move is None:
-            return None
+    #     if move is None:
+    #         return None
 
-        return (move, val.value)
+    #     return (move, val.value)
 
     def get_av_moves(self, is_max):
         av_moves = []
@@ -171,7 +171,6 @@ class TicTacToeAi:
                 #     return val
                 # Cập nhật nước đi tốt nhất
                 move = (i, j)
-            print(tmp)
 
         if move is None:
             return None
@@ -230,7 +229,7 @@ class TicTacToeAi:
         is_leaf = True
 
         if depth < self.max_depth:
-            av_moves = self.get_av_moves(is_max=True)
+            av_moves = self.get_av_moves(is_max=False)
             if isinstance(av_moves, tuple):
                 return av_moves[1]
 
