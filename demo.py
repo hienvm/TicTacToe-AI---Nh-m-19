@@ -40,8 +40,14 @@ def main():
     #     [' ', 'x', ' ', ' ', 'o'],
     # ]
 
-    # board = [[' ' for i in range(15)] for j in range(15)]
-    # board[0][0] = 'o'
+    board = [[' ' for i in range(15)] for j in range(15)]
+    for i in range(2, 15):
+        for j in range(15):
+            if (j + i) % 2:
+                board[i][j] = 'x'
+            else:
+                board[i][j] = 'o'
+    board[0][0] = 'x'
 
     ai = TicTacToeAi(5, 'o')
 

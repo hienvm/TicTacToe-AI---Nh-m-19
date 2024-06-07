@@ -58,6 +58,24 @@ class TicTacToeAi:
         if state_sz == self.m * self.n:
             return (int(self.m / 2), int(self.n / 2))
         
+        if state_sz == self.m * self.n - 1:
+            # for (i, row) in enumerate(self.board):
+            #     for (j, cell) in enumerate(row):
+            #         if cell == self.op_role:
+            #             ii = i
+            #             if j < int(self.n / 2):
+            #                 jj = j + 1
+            #             else:
+            #                 jj = j - 1
+            #             if 0 <= i < self.m and 0 <= j < self.n:
+            #                 return (i, j)
+            i = int(self.m / 2)
+            j = int(self.n / 2)
+            if self.board[i][j] == Cell.EMPTY:
+                return (i, j)
+            else:
+                return (i - 1, j - 1)
+
         self.heuristic.build(self.board)
 
         # self.prune = 0
@@ -73,13 +91,13 @@ class TicTacToeAi:
         if self.m <= 6 or self.n <= 6:
             self.max_depth = 2
             res = self.search_best_move()
-        elif state_sz <= 20:
+        elif state_sz <= 15:
             self.max_depth = 4
             print("Parallel")
             res = self.search_best_move_parallel()
         else:
             self.max_depth = 2
-            if state_sz >= 60:
+            if state_sz >= 30 and self.m * self.n >= 70:
                 print("Parallel")
                 res = self.search_best_move_parallel()
             else:

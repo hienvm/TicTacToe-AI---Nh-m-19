@@ -13,7 +13,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # host = 'http://4.145.107.27:80'  # Địa chỉ server trọng tài mặc định
-host = 'http://localhost:80'
+host = 'http://20.6.96.59:80'
 team_id = 123  # team_id mặc định
 game_info = {}  # Thông tin trò chơi để hiển thị trên giao diện
 stop_thread = False  # Biến dùng để dừng thread lắng nghe
